@@ -3,120 +3,35 @@
 <head>
 <meta charset="utf-8" />
 <title>jamovi Tutorial – 파일 불러오기</title>
-
-<!-- ✅ 이 페이지의 모든 상대경로 기준을 /image/ 로 고정 -->
-<base href="https://hyunsooseol.github.io/image/">
-
-<!-- ✅ 첫 이미지 미리 불러오기(체감속도 개선) -->
-<link rel="preload" as="image" href="1.png">
-
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
   :root{ --pad:16px; }
   html,body{ height:100%; margin:0; }
   body{ font-family:"Noto Sans KR",system-ui; background:#0b1020; color:#e5e7eb; }
-
   .app{ height:100vh; display:flex; flex-direction:column; }
-  .topbar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:12px var(--pad); background:transparent;
-  }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:12px var(--pad); }
   .title{ margin:0; font-weight:700; letter-spacing:.2px; opacity:.95; }
-  
   .btn-group{ display:flex; gap:8px; }
-  .btn{
-    padding:8px 16px; border:1px solid #334155; background:#111827;
-    color:#fff; border-radius:10px; cursor:pointer; font-weight:600;
-    transition:all .15s ease;
-  }
-  .btn:hover{ background:#1f2937; transform:translateY(-1px); }
-  .btn:disabled{ 
-    opacity:.5; cursor:not-allowed; 
-    background:#111827 !important; transform:none !important;
-  }
-  .btn.primary{ background:#3b82f6; border-color:#3b82f6; }
-  .btn.primary:hover{ background:#2563eb; }
-
-  .stage-wrap{
-    flex:1; min-height:0; display:flex; align-items:center; justify-content:center;
-    padding:0 var(--pad) var(--pad); position:relative;
-  }
-  
-  /* 안내 메시지 */
-  .guide{
-    position:absolute;
-    top:20px;
-    left:50%;
-    transform:translateX(-50%);
-    background:linear-gradient(135deg, #3b82f6, #8b5cf6);
-    padding:12px 24px;
-    border-radius:12px;
-    font-weight:600;
-    font-size:15px;
-    box-shadow:0 8px 24px rgba(59,130,246,.35);
-    animation:pulse 2s ease-in-out infinite;
-    z-index:20;
-  }
-  @keyframes pulse{
-    0%, 100%{ transform:translateX(-50%) scale(1); }
-    50%{ transform:translateX(-50%) scale(1.03); }
-  }
-  
-  .stage{ position:relative; display:inline-block; line-height:0; }
-  .shot{ display:block; width:1200px; height:auto; border-radius:14px; }
-
-  #spot{
-    position:absolute; z-index:10; cursor:pointer; border-radius:12px;
-    box-shadow:0 0 0 9999px rgba(0,0,0,.72), 0 10px 26px rgba(0,0,0,.35);
-    background:transparent;
-    transition:all .18s ease-out;
-  }
-  #spot::before{
-    content:""; position:absolute; inset:-6px; border-radius:16px;
-    border:2.5px dashed rgba(255,255,255,.95);
-    box-shadow:0 0 30px rgba(255,255,255,.35);
-    pointer-events:none;
-  }
-  #spot:hover{ box-shadow:0 0 0 9999px rgba(0,0,0,.72), 0 14px 34px rgba(0,0,0,.42); }
-
-  #spot.busy::after{
-    content:""; position:absolute; left:50%; top:50%; width:28px; height:28px;
-    margin:-14px 0 0 -14px; border:3px solid rgba(255,255,255,.92);
-    border-top-color:transparent; border-radius:50%; animation:spin .8s linear infinite;
-  }
-  @keyframes spin{ to{ transform:rotate(360deg);} }
-
-  #tip{
-    position:absolute; z-index:11; max-width:320px;
-    padding:10px 12px; border-radius:10px; font-size:14px;
-    background:#0b1220; color:#e5e7eb; border:1px solid #1f2937; 
-    box-shadow:0 6px 18px rgba(0,0,0,.25);
-    white-space:normal;
-  }
-  #tip h4{ margin:0 0 4px; font-size:15px; font-weight:600; }
-
-  .badge{ position:absolute; right:8px; bottom:8px; color:#d1d5db; opacity:.85; font-size:13px; pointer-events:none; }
-  
-  .editor{
-    position:fixed; bottom:20px; right:20px;
-    background:#1f2937; border:1px solid #334155; border-radius:10px;
-    padding:12px; max-width:350px; box-shadow:0 10px 30px rgba(0,0,0,.5);
-  }
-  .editor input{
-    width:60px; padding:4px 8px; background:#111827; border:1px solid #334155;
-    color:#e5e7eb; border-radius:4px; text-align:center;
-  }
-  .editor button{
-    margin-top:8px; padding:6px 12px; background:#3b82f6; border:none; color:#fff;
-    border-radius:6px; cursor:pointer; font-weight:600;
-  }
-  .editor button:hover{background:#2563eb}
-
-  /* 로딩 지연 안내 */
-  .loading-note{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:#0b1220; border:1px solid #1f2937; padding:10px 14px; border-radius:10px;
-    font-size:13px; color:#e5e7eb; box-shadow:0 6px 18px rgba(0,0,0,.25);
-  }
+  .btn{ padding:8px 16px; border:1px solid #334155; background:#111827; color:#fff; border-radius:10px; cursor:pointer; font-weight:600; transition:.15s }
+  .btn:hover{ background:#1f2937; transform:translateY(-1px) }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; background:#111827!important; transform:none!important }
+  .btn.primary{ background:#3b82f6; border-color:#3b82f6 }
+  .btn.primary:hover{ background:#2563eb }
+  .stage-wrap{ flex:1; min-height:0; display:flex; align-items:center; justify-content:center; padding:0 var(--pad) var(--pad); position:relative }
+  .guide{ position:absolute; top:20px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,#3b82f6,#8b5cf6); padding:12px 24px; border-radius:12px; font-weight:600; font-size:15px; box-shadow:0 8px 24px rgba(59,130,246,.35); animation:pulse 2s ease-in-out infinite; z-index:20 }
+  @keyframes pulse{ 0%,100%{transform:translateX(-50%) scale(1)} 50%{transform:translateX(-50%) scale(1.03)} }
+  .stage{ position:relative; display:inline-block; line-height:0 }
+  .shot{ display:block; width:1200px; max-width:100%; height:auto; border-radius:14px }
+  #spot{ position:absolute; z-index:10; cursor:pointer; border-radius:12px; box-shadow:0 0 0 9999px rgba(0,0,0,.72),0 10px 26px rgba(0,0,0,.35); background:transparent; transition:.18s ease-out }
+  #spot::before{ content:""; position:absolute; inset:-6px; border-radius:16px; border:2.5px dashed rgba(255,255,255,.95); box-shadow:0 0 30px rgba(255,255,255,.35); pointer-events:none }
+  #spot:hover{ box-shadow:0 0 0 9999px rgba(0,0,0,.72),0 14px 34px rgba(0,0,0,.42) }
+  #spot.busy::after{ content:""; position:absolute; left:50%; top:50%; width:28px; height:28px; margin:-14px 0 0 -14px; border:3px solid rgba(255,255,255,.92); border-top-color:transparent; border-radius:50%; animation:spin .8s linear infinite }
+  @keyframes spin{ to{ transform:rotate(360deg) } }
+  #tip{ position:absolute; z-index:11; max-width:320px; padding:10px 12px; border-radius:10px; font-size:14px; background:#0b1220; color:#e5e7eb; border:1px solid #1f2937; box-shadow:0 6px 18px rgba(0,0,0,.25) }
+  #tip h4{ margin:0 0 4px; font-size:15px; font-weight:600 }
+  .badge{ position:absolute; right:8px; bottom:8px; color:#d1d5db; opacity:.85; font-size:13px; pointer-events:none }
+  .loading-note{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:#0b1220; border:1px solid #1f2937; padding:10px 14px; border-radius:10px; font-size:13px; color:#e5e7eb; box-shadow:0 6px 18px rgba(0,0,0,.25) }
+  .error-note{ position:fixed; left:12px; bottom:12px; background:#991b1b; color:#fff; padding:10px 14px; border-radius:10px; font-size:12px; box-shadow:0 6px 18px rgba(0,0,0,.25) }
 </style>
 </head>
 <body>
@@ -133,7 +48,8 @@
   <div class="stage-wrap">
     <div class="guide" id="guide" hidden>💡 하이라이트 박스를 클릭하세요</div>
     <div class="stage" id="stage">
-      <img id="shot" class="shot" src="1.png" alt="jamovi">
+      <!-- 절대경로 + 캐시버스터 -->
+      <img id="shot" class="shot" src="https://hyunsooseol.github.io/image/1.png?v=20251014" alt="jamovi">
       <div id="spot" hidden></div>
       <div id="tip" hidden><h4 id="tip-title"></h4><div id="tip-desc"></div></div>
       <div class="badge" id="prog">Step 0 of 0</div>
@@ -142,41 +58,26 @@
   </div>
 </div>
 
-<div class="editor" id="editor" hidden>
-  <div style="font-weight:600;margin-bottom:8px;color:#60a5fa">박스 위치 조절</div>
-  <div style="display:grid;grid-template-columns:60px 70px;gap:8px;font-size:13px">
-    <span>Left:</span><input type="number" id="editL" step="5">
-    <span>Top:</span><input type="number" id="editT" step="5">
-    <span>Width:</span><input type="number" id="editW" step="5">
-    <span>Height:</span><input type="number" id="editH" step="5">
-  </div>
-  <button id="applyEdit">적용</button>
-  <button id="copyCode" style="background:#10b981">코드 복사</button>
-</div>
-
 <script>
-  // 🛠️ 개발 모드 (?dev=true)
-  const DEV_MODE = new URLSearchParams(location.search).get('dev') === 'true';
+  // 절대경로 + 캐시버스터 사용
+  const V = '20251014';
+  const IMG = n => `https://hyunsooseol.github.io/image/${n}.png?v=${V}`;
 
-  // ✅ 같은 오리진의 상대경로만 사용
   const steps = [
-    { img:'1.png', box:[0, 54, 40, 30],  title:'', desc:'왼쪽 상단 (☰) 영역을 클릭하세요.' },
-    { img:'2.png', box:[20, 230, 80, 30], title:'', desc:'"This Device"를 클릭하세요.' },
-    { img:'3.png', box:[700, 360, 60, 30], title:'', desc:'로컬 파일을 선택/업로드.' },
-    { img:'4.png', box:[0, 130, 400, 500], title:'', desc:'데이터시트를 확인하세요.' },
+    { img: IMG(1), box:[0, 54, 40, 30],  title:'', desc:'왼쪽 상단 (☰) 영역을 클릭하세요.' },
+    { img: IMG(2), box:[20, 230, 80, 30], title:'', desc:'"This Device"를 클릭하세요.' },
+    { img: IMG(3), box:[700, 360, 60, 30], title:'', desc:'로컬 파일을 선택/업로드.' },
+    { img: IMG(4), box:[0, 130, 400, 500], title:'', desc:'데이터시트를 확인하세요.' },
   ];
 
-  const stage = document.getElementById('stage');
   const shot = document.getElementById('shot');
   const spot = document.getElementById('spot');
   const tip = document.getElementById('tip');
   const tipTitle = document.getElementById('tip-title');
   const tipDesc = document.getElementById('tip-desc');
   const prog = document.getElementById('prog');
-  const editor = document.getElementById('editor');
   const guide = document.getElementById('guide');
-  const loadingNote = document.getElementById('loading');
-
+  const loading = document.getElementById('loading');
   const startBtn = document.getElementById('startBtn');
   const prevBtn = document.getElementById('prevBtn');
   const nextBtn = document.getElementById('nextBtn');
@@ -190,117 +91,89 @@
   }
 
   function place(i){
-    const [left, top, width, height] = steps[i].box;
+    const [L,T,W,H] = steps[i].box;
     const scale = shot.offsetWidth / 1200;
 
-    spot.style.left = Math.round(left * scale) + 'px';
-    spot.style.top = Math.round(top * scale) + 'px';
-    spot.style.width = Math.round(width * scale) + 'px';
-    spot.style.height = Math.round(height * scale) + 'px';
+    spot.style.left = Math.round(L*scale)+'px';
+    spot.style.top  = Math.round(T*scale)+'px';
+    spot.style.width= Math.round(W*scale)+'px';
+    spot.style.height=Math.round(H*scale)+'px';
     spot.hidden = false; spot.classList.remove('busy');
 
     tipTitle.textContent = steps[i].title;
     tipDesc.textContent  = steps[i].desc;
 
-    const tipW = 320;
-    let tipLeft = left * scale + width * scale + 12;
-    let tipTop  = top * scale;
-
-    if (tipLeft + tipW > shot.offsetWidth) tipLeft = Math.max(0, left * scale - tipW - 12);
-    tip.style.left = Math.round(tipLeft) + 'px';
-    tip.style.top  = Math.round(tipTop)  + 'px';
+    const tipW=320; let tipLeft=L*scale+W*scale+12, tipTop=T*scale;
+    if(tipLeft+tipW>shot.offsetWidth) tipLeft = Math.max(0, L*scale - tipW - 12);
+    tip.style.left = Math.round(tipLeft)+'px';
+    tip.style.top  = Math.round(tipTop)+'px';
     tip.hidden = false;
 
     prog.textContent = `Step ${i+1} of ${steps.length}`;
     guide.hidden = false;
-
-    if(DEV_MODE){
-      editor.hidden = false;
-      document.getElementById('editL').value = left;
-      document.getElementById('editT').value = top;
-      document.getElementById('editW').value = width;
-      document.getElementById('editH').value = height;
-    }
-
     updateButtons();
   }
 
+  function note(msg){
+    const n = document.createElement('div');
+    n.className = 'error-note';
+    n.textContent = msg;
+    document.body.appendChild(n);
+    setTimeout(()=>n.remove(), 4000);
+  }
+
   function showStep(i){
-    if(i < 0 || i >= steps.length) return;
+    if(i<0 || i>=steps.length) return;
     idx = i; locked = false;
 
     const want = steps[i].img;
-    const wantURL = new URL(want, document.baseURI).href;
-    const needSwap = shot.src !== wantURL;
+    const needSwap = shot.src !== want;
 
     spot.hidden = true; tip.hidden = true; guide.hidden = true;
-    loadingNote.hidden = false; loadingNote.textContent = '이미지 로딩 중…';
+    loading.hidden = false; loading.textContent = '이미지 로딩 중…';
 
-    let failTimer = setTimeout(() => {
-      loadingNote.textContent = '이미지 로드 지연… 잠시만요';
-    }, 700);
+    // onload가 오지 않아도 1.2초 후 강제 진행(폴백)
+    let forced = false;
+    const fallback = setTimeout(()=>{
+      forced = true;
+      loading.hidden = true;
+      place(i);
+      note('⚠️ 이미지 onload 지연 — 폴백으로 진행');
+    }, 1200);
 
     shot.onerror = () => {
-      clearTimeout(failTimer);
-      loadingNote.textContent = `이미지 로드 실패: ${want}`;
-      prog.textContent = `이미지 로드 실패: ${want}`;
+      clearTimeout(fallback);
+      loading.hidden = true;
+      note('❌ 이미지 로드 실패: '+want);
+      prog.textContent = '이미지 로드 실패';
     };
 
     shot.onload = () => {
-      clearTimeout(failTimer);
-      loadingNote.hidden = true;
-      setTimeout(() => place(i), 30);
+      if(forced) return; // 이미 폴백으로 진행했다면 무시
+      clearTimeout(fallback);
+      loading.hidden = true;
+      place(i);
       shot.onload = null;
     };
 
-    if (needSwap) shot.src = want; else { loadingNote.hidden = true; place(i); }
+    if(needSwap) shot.src = want; else { loading.hidden=true; place(i); }
   }
 
-  spot.addEventListener('click', () => {
+  spot.addEventListener('click', ()=>{
     if(locked) return;
-    locked = true;
-    spot.classList.add('busy');
-    guide.hidden = true;
-
-    setTimeout(() => {
+    locked = true; spot.classList.add('busy'); guide.hidden = true;
+    setTimeout(()=>{
       spot.classList.remove('busy');
-      if(idx < steps.length - 1) showStep(idx + 1);
-      else {
-        spot.hidden = true; tip.hidden = true; guide.hidden = true;
-        prog.textContent = 'Done ✓';
-        if(DEV_MODE) editor.hidden = true;
-        updateButtons();
-      }
+      if(idx < steps.length-1) showStep(idx+1);
+      else { spot.hidden=true; tip.hidden=true; guide.hidden=true; prog.textContent='Done ✓'; updateButtons(); }
     }, 600);
   });
 
-  startBtn.onclick = () => showStep(0);
-  prevBtn.onclick  = () => { if(idx > 0) showStep(idx - 1); };
-  nextBtn.onclick  = () => { if(idx < steps.length - 1) showStep(idx + 1); };
+  startBtn.onclick = ()=>showStep(0);
+  prevBtn.onclick  = ()=>{ if(idx>0) showStep(idx-1); };
+  nextBtn.onclick  = ()=>{ if(idx<steps.length-1) showStep(idx+1); };
 
-  if(DEV_MODE){
-    document.getElementById('applyEdit').onclick = () => {
-      const L = parseInt(document.getElementById('editL').value);
-      const T = parseInt(document.getElementById('editT').value);
-      const W = parseInt(document.getElementById('editW').value);
-      const H = parseInt(document.getElementById('editH').value);
-      steps[idx].box = [L, T, W, H];
-      place(idx);
-    };
-    document.getElementById('copyCode').onclick = () => {
-      const code = `const steps = [\n${steps.map(s =>
-        `  { img:'${s.img}', box:[${s.box.join(', ')}], title:'${s.title}', desc:'${s.desc}' }`
-      ).join(',\n')}\n];`;
-      navigator.clipboard.writeText(code);
-      alert('✅ 코드가 클립보드에 복사되었습니다!');
-    };
-  }
-
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { if(idx >= 0) place(idx); }, 100);
-  });
+  let t; window.addEventListener('resize',()=>{ clearTimeout(t); t=setTimeout(()=>{ if(idx>=0) place(idx); },100); });
 </script>
 </body>
 </html>
